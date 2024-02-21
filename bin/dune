@@ -1,0 +1,4 @@
+(executable
+ (public_name url_shortner)
+ (name main)
+ (libraries url_shortner))
