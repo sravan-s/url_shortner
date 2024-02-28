@@ -5,7 +5,7 @@
 (generate_opam_files true)
 
 (source
- (github sravan-s/urk_shortner))
+ (github sravan-s/url_shortner))
 
 (authors "Sravan")
 
