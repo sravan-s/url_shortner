@@ -1,4 +1,6 @@
 (executable
  (public_name url_shortner)
  (name main)
- (libraries url_shortner))
+ (libraries dream)
+ (preprocess (pps lwt_ppx ppx_yojson_conv))
+)

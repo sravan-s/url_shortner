@@ -10,10 +10,11 @@ homepage: "https://github.com/sravan-s/url_shortner"
 doc: "https://url/to/documentation"
 bug-reports: "https://github.com/sravan-s/url_shortner/issues"
 depends: [
-  "ocaml"
+  "ocaml" {= "5.1.1"}
   "dune" {>= "3.13"}
+  "dream" {>= "1.0.0"}
+  "ppx_yojson_conv" {= "0.16.0"}
   "odoc" {with-doc}
-  "dream" {="1.0.0~alpha5"}
 ]
 build: [
   ["dune" "subst"] {dev}

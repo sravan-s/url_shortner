@@ -19,7 +19,12 @@
  (name url_shortner)
  (synopsis "Trying to build a url shortner webserver in ocaml")
  (description ":)")
- (depends ocaml dune)
+ (depends 
+   (ocaml (= "5.1.1"))
+   dune
+   (dream (>= "1.0.0"))
+   (ppx_yojson_conv (= "0.16.0"))
+  )
  (tags
   (topics "to describe" your project)))
 
