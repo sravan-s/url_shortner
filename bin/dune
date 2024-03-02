@@ -1,6 +1,6 @@
 (executable
  (public_name url_shortner)
  (name main)
- (libraries dream)
+ (libraries dream sqlite3)
  (preprocess (pps lwt_ppx ppx_yojson_conv))
 )

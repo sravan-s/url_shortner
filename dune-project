@@ -24,6 +24,7 @@
    dune
    (dream (>= "1.0.0"))
    (ppx_yojson_conv (= "0.16.0"))
+   (sqlite3 (= "5.1.0"))
   )
  (tags
   (topics "to describe" your project)))
