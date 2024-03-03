@@ -54,6 +54,8 @@ let decode (li: string) =
   |> List.map idx_in_seed
   |> int_list_to_num
 
+let encode l = to_char @@ encodenNum l
+
 (* Examples *)
 (* let _ = insert_into("asdassdas") *)
 (* let l = to_char(encodenNum 2343)

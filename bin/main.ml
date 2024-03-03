@@ -14,15 +14,6 @@ type create_payload = {
   url : string;
 } [@@deriving yojson]
 
-let l = Shorten.to_char(Shorten.encodenNum 2343)
-let () = print_string l
-let () = print_newline ()
-let () = try
-    print_int (Shorten.decode l)
-    with
-    | Failure msg -> print_endline (msg);
-    |  _ -> print_endline "Unknown error occurred"
-
 (* www.wikipedia.com/a/b/c => Link.lasso/v *)
 let () =
   ignore(Db.bootstrap);
@@ -30,26 +21,31 @@ let () =
   @@ Dream.logger
   @@ Dream.router [
 
-    Dream.get "/"
-      (fun _ ->
-        Dream.html ~status:`Accepted ~code:204 "Good morning, world!");
+    Dream.get "/" (fun _ -> Dream.html "Good morning, world!");
 
     Dream.post "/shorten"
       (fun request ->
         let%lwt body = Dream.body request in
-
         let create_payload =
           body
           |> Yojson.Safe.from_string
           |> create_payload_of_yojson
         in
-
-        `String create_payload.url
+        let shortened =
+          Db.insert_into create_payload.url
+          |> Shorten.encode 
+        in
+        Dream.log "shortened %s"  shortened;
+        `String shortened
         |> Yojson.Safe.to_string
         |> Dream.json);
 
     Dream.get "/v/:shortened"
       (fun request ->
-        Dream.html("unshortened:" ^ Dream.param request "shortened")
+        let req_str = Dream.param request "shortened" in
+        let numeric = Shorten.decode (req_str) in
+        match (Db.get_longurl numeric) with
+          | Some url -> Dream.redirect request url
+          | _ -> Dream.not_found request
       )
   ]
