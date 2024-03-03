@@ -30,3 +30,6 @@ _opam/
 
 node_modules/
 
+# database
+db/url_shortner.sqlitedb
+

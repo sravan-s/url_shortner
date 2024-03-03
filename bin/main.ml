@@ -10,6 +10,32 @@
 
 open Ppx_yojson_conv_lib.Yojson_conv.Primitives
 
+let db_url = "./db/url_shortner.sqlitedb"
+let db_table_name = "urls"
+let db_col_long_url = "long_url"
+
+let bootstrap =
+  ignore(print_endline "start bootstrapping DB");
+  let db = Sqlite3.db_open db_url in
+  let db_query_create_table =
+    Printf.sprintf "CREATE TABLE %s
+    (id INTEGER PRIMARY KEY AUTOINCREMENT, %s text NOT NULL);"
+    db_table_name
+    db_col_long_url in
+  let init = ignore (Sqlite3.exec db db_query_create_table) in
+  ignore(print_endline "finish bootstrapping DB");
+  init
+
+(* There are error chances at various DB steps and int conversion, I ignore them for now *)
+let insert_into (url: string): int =
+  let db = Sqlite3.db_open db_url in
+  let stmt = Printf.sprintf
+    "INSERT INTO %s (%s) VALUES (%s);" db_table_name db_col_long_url url in
+  let last_insert_id = Sqlite3.last_insert_rowid db in
+  ignore(Sqlite3.exec db stmt);
+  Gc.full_major ();
+  Int64.to_int last_insert_id
+
 type create_payload = {
   url : string;
 } [@@deriving yojson]
@@ -46,7 +72,7 @@ let to_char li = cl2s @@ List.map (fun item -> (List.nth alphabets item)) li
 let idx_in_seed (n: char) =
   let rec find_index_helper lst x index =
     match lst with
-    | [] -> failwith "Invalid string"
+    | [] -> failwith "Invalid character"
     | hd :: t1 ->
       if hd = x then
         index
@@ -67,7 +93,9 @@ let string_to_char_list str =
   List.of_seq char_seq
 let decode (li: string) =
   List.map idx_in_seed (string_to_char_list li)
-  |> int_list_to_num 
+  |> int_list_to_num
+
+(* let _ = insert_into("asdassdas") *)
 
 (* let l = to_char(encodenNum 2343)
 let () = print_string l
@@ -77,10 +105,11 @@ let () = try
     with
     | Failure msg -> print_endline (msg);
     |  _ -> print_endline "Unknown error occurred" *)
-    
+
+let _ = bootstrap
 
 (* www.wikipedia.com/a/b/c => Link.lasso/v *)
-(* let () =
+let () =
   Dream.run
   @@ Dream.logger
   @@ Dream.router [
@@ -102,9 +131,9 @@ let () = try
         `String create_payload.url
         |> Yojson.Safe.to_string
         |> Dream.json);
-    
+
     Dream.get "/v/:shortened"
       (fun request ->
         Dream.html("unshortened:" ^ Dream.param request "shortened")
       )
-  ] *)
+  ]
